@@ -1,0 +1,6 @@
+progressbar
+simplejson
+itsdangerous
+requests
+sphinx
+progressbar2
