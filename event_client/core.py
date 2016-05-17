@@ -4,11 +4,13 @@ import simplejson as json
 import requests
 import itsdangerous
 import hashlib
+import datetime
 from pprint import pprint
 
 
 class EventClient:
-    def __init__(self, api_id, api_secret, endpoint='http://localhost:8000'):
+    def __init__(self, api_id, api_secret, endpoint='http://localhost:8000', source='default'):
+        self.source = source
         self.endpoint = endpoint
         self.api_id = api_id
         self.api_secret = api_secret
@@ -21,6 +23,9 @@ class EventClient:
         }
 
     def push_event(self, event_type, data: dict):
+        data['source'] = self.source
+        data['datetime'] = str(datetime.datetime.now())
+
         self.api_post_req('/type/%s/event' % event_type, data)
 
     def create_type(self, json_schema):
@@ -35,5 +40,4 @@ class EventClient:
 
     def get_types(self):
         req = requests.get("%s/type" % self.endpoint, headers=self.get_headers(''))
-        print(req.status_code)
-        pprint(req.json())
+        return req.json()
