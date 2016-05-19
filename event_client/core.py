@@ -22,9 +22,11 @@ class EventClient:
             'x-api-sign': self.signer.sign(hashlib.sha1(data.encode()).hexdigest())
         }
 
-    def push_event(self, event_type, data: dict):
+    def push_event(self, event_type: str, data: dict, tags: list = []):
         data['source'] = self.source
         data['datetime'] = str(datetime.datetime.now())
+        data['tags'] = tags
+        data = [data]
 
         self.api_post_req('/type/%s/event' % event_type, data)
 

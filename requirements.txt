@@ -1,4 +1,3 @@
-progressbar
 simplejson
 itsdangerous
 requests

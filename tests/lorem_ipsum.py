@@ -58,4 +58,4 @@ if __name__ == '__main__':
             "params": {
                 "system": random.choice(["slepemapy.cz", "devel.slepemapy.cz", "anatom.cz", "umimecesky.cz"])
             }
-        })
+        }, tags=[random.choice(["prod", "test", "experiment"])])
