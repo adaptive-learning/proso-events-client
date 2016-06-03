@@ -3,3 +3,4 @@ itsdangerous
 requests
 sphinx
 progressbar2
+pytest-xdist
