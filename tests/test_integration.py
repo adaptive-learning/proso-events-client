@@ -1,21 +1,27 @@
-from event_client import *
-import sys
-import random
-import string
-import progressbar
+from .context import event_client
+from .test_file_log import get_payload
+import pytest
+import os
 
 
-def random_string(n):
-    return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(n))
+def api_endpoint_available():
+    return not all([i in os.environ for i in ['events_client_id', 'events_client_secret', 'events_client_url']])
 
 
-if __name__ == '__main__':
-    api_id, api_secret = sys.argv[1:3]
+def initialize(db_path):
+    return event_client.EventClient(os.environ['events_client_id'], os.environ['events_client_secret'], os.environ['events_client_url'], 'test'), event_client.EventsLogger(db_path, 'test')
 
-    client = EventClient(api_id, api_secret)
+
+@pytest.mark.skipif(api_endpoint_available(), reason="requires running API")
+def test_function(tmpdir):
+    db_path = str(tmpdir.join("example.db").realpath())
+
+    event_api, event_logger = initialize(db_path)
+
+    # create test event type
 
     try:
-        client.create_type({
+        event_api.create_type({
             "$schema": "http://json-schema.org/draft-04/schema#",
             "title": "answer_test",
             "description": "answer event",
@@ -47,15 +53,12 @@ if __name__ == '__main__':
     except:
         pass
 
-    bar = progressbar.ProgressBar()
-    for i in bar(range(10 ** 3)):
-        client.push_event('answer_test', {
-            "user_id": random.randint(1, 100),
-            "is_correct": True if random.random() > 0.2 else False,
-            "context_id": random.randint(1, 100),
-            "item_id": random.randint(1, 50000),
-            "response_time_ms": random.randint(950, 20000),
-            "params": {
-                "system": random.choice(["slepemapy.cz", "devel.slepemapy.cz", "anatom.cz", "umimecesky.cz"])
-            }
-        }, tags=[random.choice(["prod", "test", "experiment"])])
+    # add events
+    payload = get_payload(10)
+
+    for i in payload:
+        event_logger.emit('answer_test', i, ['test'])
+
+        # send to datastore via API
+
+    event_client.Pusher.push_all_new(event_api, event_logger)
