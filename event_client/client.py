@@ -4,8 +4,6 @@ import simplejson as json
 import requests
 import itsdangerous
 import hashlib
-import datetime
-from pprint import pprint
 
 
 class EventClient:
@@ -22,13 +20,11 @@ class EventClient:
             'x-api-sign': self.signer.sign(hashlib.sha1(data.encode()).hexdigest())
         }
 
-    def push_event(self, event_type: str, data: dict, tags: list = []):
+    def push_event(self, event_type: str, data: dict):
         data['source'] = self.source
-        data['datetime'] = str(datetime.datetime.now())
-        data['tags'] = tags
         data = [data]
 
-        self.api_post_req('/type/%s/event' % event_type, data)
+        return self.api_post_req('/type/%s/event' % event_type, data)
 
     def create_type(self, json_schema):
         self.api_post_req('/type', json_schema)
