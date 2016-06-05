@@ -39,3 +39,9 @@ class EventClient:
     def get_types(self):
         req = requests.get("%s/type" % self.endpoint, headers=self.get_headers(''))
         return req.json()
+
+    def delete_type(self, type_name):
+        req = requests.delete("%s/type/%s" % (self.endpoint, type_name), headers=self.get_headers(''))
+
+        if req.status_code != 200:
+            raise Exception("Event storage error. Status: %s" % req.status_code)

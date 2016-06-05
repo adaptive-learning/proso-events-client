@@ -2,6 +2,8 @@ from .context import event_client
 from .test_file_log import get_payload
 import pytest
 import os
+import string
+import random
 
 
 def api_endpoint_available():
@@ -20,45 +22,49 @@ def test_function(tmpdir):
 
     # create test event type
 
-    try:
-        event_api.create_type({
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "title": "answer_test",
-            "description": "answer event",
-            "type": "object",
-            "properties": {
-                "user_id": {
-                    "description": "The unique identifier for the user.",
-                    "type": "integer"
-                },
-                "is_correct": {
-                    "type": "boolean"
-                },
-                "context_id": {
-                    "type": "integer"
-                },
-                "item_id": {
-                    "type": "integer"
-                },
-                "response_time_ms": {
-                    "description": "User's response time in miliseconds.",
-                    "type": "integer"
-                },
-                "params": {
-                    "type": "object"
-                }
+    type_name = 'test_answer'
+
+    event_api.delete_type(type_name)
+
+    event_api.create_type({
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "title": type_name,
+        "description": "answer event",
+        "type": "object",
+        "properties": {
+            "user_id": {
+                "description": "The unique identifier for the user.",
+                "type": "integer"
             },
-            "required": ["user_id", "is_correct", "context_id", "item_id"]
-        })
-    except:
-        pass
+            "is_correct": {
+                "type": "boolean"
+            },
+            "context_id": {
+                "type": "integer"
+            },
+            "item_id": {
+                "type": "integer"
+            },
+            "response_time_ms": {
+                "description": "User's response time in miliseconds.",
+                "type": "integer"
+            },
+            "params": {
+                "type": "object"
+            }
+        },
+        "required": ["user_id", "is_correct", "context_id", "item_id"]
+    })
 
     # add events
     payload = get_payload(10)
 
     for i in payload:
-        event_logger.emit('answer_test', i, ['test'])
+        event_logger.emit(type_name, i, ['test'])
 
-        # send to datastore via API
-
+    # send to datastore via API
     event_client.Pusher.push_all_new(event_api, event_logger)
+
+    # delete temporal type
+
+    event_api.delete_type(type_name)
