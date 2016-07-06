@@ -18,8 +18,8 @@ def get_payload(n: int = 10) -> list:
     return res
 
 
-def test_sqlite_logging(tmpdir):
-    db_path = str(tmpdir.join("example.db").realpath())
+def test_file_logging(tmpdir):
+    db_path = str(tmpdir.join("event.log").realpath())
     ev = event_client.EventsLogger(db_path, 'test')
 
     payload = get_payload()
@@ -27,22 +27,4 @@ def test_sqlite_logging(tmpdir):
     for p in payload:
         ev.emit('test_answer', p)
 
-    assert all([(e.payload in payload) for e in ev.read_all()])
-    ev.emit('test_answer', {'payload': 'test'})
-    assert all([(e.payload in payload) for e in ev.read_all()]) is False
-
-
-def test_sqlite_ack_event(tmpdir):
-    db_path = str(tmpdir.join("example.db").realpath())
-    ev = event_client.EventsLogger(db_path, 'test')
-
-    for p in get_payload(10):
-        ev.emit('test_answer', p)
-
-    for e in ev.read_new():
-        e.set_ack()
-        break
-
-    assert len(list(ev.read_new())) == 9 and len(list(ev.read_all())) == 10
-
-
+    assert all([event in payload for event in ev.event_file.read_events()])

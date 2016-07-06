@@ -4,6 +4,8 @@ import simplejson as json
 import requests
 import itsdangerous
 import hashlib
+import psycopg2
+import datetime
 
 
 class EventClient:
@@ -24,6 +26,9 @@ class EventClient:
         data['source'] = self.source
         data = [data]
 
+        return self.push_many_events(event_type, data)
+
+    def push_many_events(self, event_type: str, data: list):
         return self.api_post_req('/type/%s/event' % event_type, data)
 
     def create_type(self, json_schema):
@@ -45,3 +50,11 @@ class EventClient:
 
         if req.status_code != 200:
             raise Exception("Event storage error. Status: %s" % req.status_code)
+
+    def get_db_connection(self):
+        req = requests.get("%s/db" % self.endpoint, headers=self.get_headers(''))
+
+        if req.status_code != 200:
+            raise Exception("Event storage error. Status: %s" % req.status_code)
+
+        return psycopg2.connect(**req.json())

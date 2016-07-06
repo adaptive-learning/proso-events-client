@@ -4,6 +4,7 @@ import pytest
 import os
 import string
 import random
+import datetime
 
 
 def api_endpoint_available():
@@ -15,8 +16,8 @@ def initialize(db_path):
 
 
 @pytest.mark.skipif(api_endpoint_available(), reason="requires running API")
-def test_function(tmpdir):
-    db_path = str(tmpdir.join("example.db").realpath())
+def test_function(tmpdir, delete_table: bool = True):
+    db_path = str(tmpdir.join("events.log").realpath())
 
     event_api, event_logger = initialize(db_path)
 
@@ -63,8 +64,16 @@ def test_function(tmpdir):
         event_logger.emit(type_name, i, ['test'])
 
     # send to datastore via API
-    event_client.Pusher.push_all_new(event_api, event_logger)
+    event_client.Pusher.push_all(event_api, event_logger.event_file)
+
+    # retrieve events
+
+    conn = event_api.get_db_connection()
+    cursor = conn.cursor()
+
+    # event_api.get_events(type_name, 'test', [], datetime.datetime.now() - datetime.timedelta(days=1), datetime.datetime.now())
 
     # delete temporal type
 
-    event_api.delete_type(type_name)
+    if delete_table:
+        event_api.delete_type(type_name)

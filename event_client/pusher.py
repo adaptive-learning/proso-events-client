@@ -1,12 +1,11 @@
-from . import *
+from .client import *
+from .logger import *
 
 
 class Pusher:
     @staticmethod
-    def push_all_new(api_client: EventClient, event_logger: EventsLogger):
-        for event in event_logger.read_new():
-            try:
-                api_client.push_event(event.event_type, event.payload)
-                event.set_ack()
-            except:
-                pass
+    def push_all(api_client: EventClient, event_file: EventFile):
+        for event in event_file.read_events():
+            event_type = event['_type']
+            del event['_type']
+            api_client.push_event(event_type, event)
