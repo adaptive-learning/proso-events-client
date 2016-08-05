@@ -8,15 +8,15 @@ import datetime
 
 
 def api_endpoint_available():
-    return not all([i in os.environ for i in ['events_client_id', 'events_client_secret', 'events_client_url']])
+    return not all([i in os.environ for i in ['proso_events_token', 'proso_events_url']])
 
 
 def initialize(db_path):
-    return event_client.EventClient(os.environ['events_client_id'], os.environ['events_client_secret'], os.environ['events_client_url'], 'test'), event_client.EventsLogger(db_path, 'test')
+    return event_client.EventClient(os.environ['proso_events_token'], os.environ['proso_events_url'], 'test'), event_client.EventsLogger(db_path, 'test')
 
 
 @pytest.mark.skipif(api_endpoint_available(), reason="requires running API")
-def test_function(tmpdir, delete_table: bool = True):
+def test_integration(tmpdir, delete_table: bool = True):
     db_path = str(tmpdir.join("events.log").realpath())
 
     event_api, event_logger = initialize(db_path)

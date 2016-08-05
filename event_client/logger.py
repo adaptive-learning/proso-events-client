@@ -1,7 +1,6 @@
 import json
 import datetime
 import zlib
-import base64
 
 
 class EventsLogger:
