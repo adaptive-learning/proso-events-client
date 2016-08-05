@@ -1,0 +1,4 @@
+site_name: Proso events API client
+pages:
+- Home: index.md
+theme: readthedocs
