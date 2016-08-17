@@ -5,20 +5,20 @@ import os
 DIR = os.path.dirname(os.path.abspath(__file__))
 
 with open('README.rst') as f:
-    readme = f.read()
+    README = f.read()
 
 with open('LICENSE') as f:
-    license = f.read()
+    LICENSE = f.read()
 
 setup(
     name='event_client',
     version='0.0.1',
     description='Client for "event storage"."',
-    long_description=readme,
+    long_description=README,
     author='Jan Karásek',
     author_email='xkarase1@fi.muni.cz',
     url='',
-    license=license,
+    license=LICENSE,
     include_package_data = True,
     packages=find_packages(exclude=('tests', 'docs')),
     install_requires=[
