@@ -11,7 +11,7 @@ with open('LICENSE') as f:
     LICENSE = f.read()
 
 setup(
-    name='event_client',
+    name='proso-events-client',
     version='0.0.1',
     description='Client for "event storage"."',
     long_description=README,
@@ -21,6 +21,7 @@ setup(
     license=LICENSE,
     include_package_data = True,
     packages=find_packages(exclude=('tests', 'docs')),
+    namespace_packages=['proso', 'proso.events'],
     install_requires=[
         str(r.req)
         for r in parse_requirements(DIR + '/requirements.txt', session=False)
