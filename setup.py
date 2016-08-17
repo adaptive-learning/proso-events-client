@@ -1,6 +1,8 @@
-# -*- coding: utf-8 -*-
-
+from pip.req import parse_requirements
 from setuptools import setup, find_packages
+import os
+
+DIR = os.path.dirname(os.path.abspath(__file__))
 
 with open('README.rst') as f:
     readme = f.read()
@@ -17,5 +19,10 @@ setup(
     author_email='xkarase1@fi.muni.cz',
     url='',
     license=license,
-    packages=find_packages(exclude=('tests', 'docs'))
+    include_package_data = True,
+    packages=find_packages(exclude=('tests', 'docs')),
+    install_requires=[
+        str(r.req)
+        for r in parse_requirements(DIR + '/requirements.txt', session=False)
+    ]
 )
