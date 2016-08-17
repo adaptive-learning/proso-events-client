@@ -3,4 +3,4 @@ import os
 
 sys.path.insert(0, os.path.abspath('..'))
 
-import event_client
+import proso.events.client as event_client

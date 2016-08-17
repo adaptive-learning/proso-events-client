@@ -1,4 +1,5 @@
-simplejson
-requests
-pytest-xdist
 mkdocs
+psycopg2
+pytest-xdist
+requests
+simplejson
