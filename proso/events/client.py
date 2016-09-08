@@ -5,6 +5,7 @@ import psycopg2
 import datetime
 import datetime
 import zlib
+import os
 
 
 class EventClient:
@@ -82,6 +83,7 @@ class EventFile:
         """
         Write dict to file (JSON + CRC)
         """
+        self.try_make_file(self.log_path)
         data = json.dumps(data)
         with open(self.log_path, 'a') as f:
             f.write("%s %s\n" % (data, zlib.crc32(data.encode())))
@@ -100,6 +102,20 @@ class EventFile:
                 else:
                     pass  # skip damaged records
 
+    def trunc(self):
+        """
+        Truncate log file.
+        """
+        open(self.log_path, 'w')
+
+    @staticmethod
+    def try_make_file(filename):
+        try:
+            with open(filename, 'x'):
+                return False
+        except FileExistsError:
+            return True
+
 
 class Pusher:
     @staticmethod
@@ -108,3 +124,4 @@ class Pusher:
             event_type = event['_type']
             del event['_type']
             api_client.push_event(event_type, event)
+        event_file.trunc()
