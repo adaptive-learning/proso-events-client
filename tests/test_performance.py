@@ -1,29 +1,18 @@
 from .context import event_client
 from .test_file_log import get_payload
+from .test_integration import api_endpoint_available, initialize
 import pytest
-import os
-import string
-import random
-import datetime
-
-
-def api_endpoint_available():
-    return all([i in os.environ for i in ['proso_events_token', 'proso_events_url']])
-
-
-def initialize(db_path):
-    return event_client.EventClient(os.environ['proso_events_token'], os.environ['proso_events_url'], 'test'), event_client.EventsLogger(db_path, 'test')
 
 
 @pytest.mark.skipif(not api_endpoint_available(), reason="requires running API")
-def test_integration(tmpdir, delete_table: bool = False):
+def test_performance_insert(tmpdir, delete_table: bool = False):
     db_path = str(tmpdir.join("events.log").realpath())
 
     event_api, event_logger = initialize(db_path)
 
     # create test event type
 
-    type_name = 'test_answer'
+    type_name = 'test_performance'
 
     event_api.delete_type(type_name)
 
@@ -58,9 +47,12 @@ def test_integration(tmpdir, delete_table: bool = False):
     })
 
     # add events
-    payload = get_payload(10)
-    for i in payload:
-        event_logger.emit(type_name, i, ['test'])
+
+    for i in range(10):
+        payload = get_payload(100)
+
+        for i in payload:
+            event_logger.emit(type_name, i, ['test'])
 
     # send to datastore via API
     event_client.Pusher.push_all(event_api, event_logger.event_file)
