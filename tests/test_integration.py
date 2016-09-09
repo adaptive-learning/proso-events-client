@@ -63,7 +63,8 @@ def test_integration(tmpdir, delete_table: bool = False):
         event_logger.emit(type_name, i, ['test'])
 
     # send to datastore via API
-    event_client.Pusher.push_all(event_api, event_logger.event_file)
+    pusher = event_client.Pusher(event_api, event_logger.event_file)
+    pusher.push_all()
 
     # retrieve events
 

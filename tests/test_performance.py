@@ -5,7 +5,7 @@ import pytest
 
 
 @pytest.mark.skipif(not api_endpoint_available(), reason="requires running API")
-def test_performance_insert(tmpdir, delete_table: bool = False):
+def test_performance_insert_1000(tmpdir, delete_table: bool = False):
     db_path = str(tmpdir.join("events.log").realpath())
 
     event_api, event_logger = initialize(db_path)
@@ -48,21 +48,14 @@ def test_performance_insert(tmpdir, delete_table: bool = False):
 
     # add events
 
-    for i in range(10):
-        payload = get_payload(100)
+    payload = get_payload(1000)
 
-        for i in payload:
-            event_logger.emit(type_name, i, ['test'])
+    for i in payload:
+        event_logger.emit(type_name, i, ['test'])
 
     # send to datastore via API
-    event_client.Pusher.push_all(event_api, event_logger.event_file)
-
-    # retrieve events
-
-    conn = event_api.get_db_connection()
-    cursor = conn.cursor()
-
-    # event_api.get_events(type_name, 'test', [], datetime.datetime.now() - datetime.timedelta(days=1), datetime.datetime.now())
+    pusher = event_client.Pusher(event_api, event_logger.event_file)
+    pusher.push_all()
 
     # delete temporal type
 

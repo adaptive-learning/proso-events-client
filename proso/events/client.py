@@ -118,10 +118,28 @@ class EventFile:
 
 
 class Pusher:
-    @staticmethod
-    def push_all(api_client: EventClient, event_file: EventFile):
-        for event in event_file.read_events():
+    def __init__(self, api_client: EventClient, event_file: EventFile):
+        self.event_file = event_file
+        self.api_client = api_client
+        self.events = {}
+
+    def push_all(self):
+        for event in self.event_file.read_events():
             event_type = event['_type']
             del event['_type']
-            api_client.push_event(event_type, event)
-        event_file.trunc()
+
+            if event_type not in self.events:
+                self.events[event_type] = []
+
+            self.events[event_type].append(event)
+            self.push_events(1000)
+
+        self.push_events(0)
+
+        self.event_file.trunc()
+
+    def push_events(self, limit: int):
+        for event_type in self.events:
+            if len(self.events[event_type]) > limit:
+                self.api_client.push_many_events(event_type, self.events[event_type])
+                self.events[event_type] = []
