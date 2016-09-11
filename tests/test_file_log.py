@@ -1,21 +1,5 @@
 from .context import event_client
-import random
-
-
-def get_payload(n: int = 10) -> list:
-    res = []
-    for i in range(n):
-        res.append({
-            "user_id": random.randint(1, 100),
-            "is_correct": True if random.random() > 0.2 else False,
-            "context_id": random.randint(1, 100),
-            "item_id": random.randint(1, 50000),
-            "response_time_ms": random.randint(950, 20000),
-            "params": {
-                "system": random.choice(["slepemapy.cz", "devel.slepemapy.cz", "anatom.cz", "umimecesky.cz"])
-            }})
-
-    return res
+from .helpers import *
 
 
 def test_file_logging(tmpdir):
