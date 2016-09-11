@@ -118,7 +118,8 @@ class EventFile:
 
 
 class Pusher:
-    def __init__(self, api_client: EventClient, event_file: EventFile):
+    def __init__(self, api_client: EventClient, event_file: EventFile, batch_size: int = 1000):
+        self.batch_size = batch_size
         self.event_file = event_file
         self.api_client = api_client
         self.events = {}
@@ -132,7 +133,7 @@ class Pusher:
                 self.events[event_type] = []
 
             self.events[event_type].append(event)
-            self.push_events(1000)
+            self.push_events(self.batch_size)
 
         self.push_events(0)
 
@@ -140,6 +141,6 @@ class Pusher:
 
     def push_events(self, limit: int):
         for event_type in self.events:
-            if len(self.events[event_type]) > limit:
+            if len(self.events[event_type]) >= limit:
                 self.api_client.push_many_events(event_type, self.events[event_type])
                 self.events[event_type] = []
