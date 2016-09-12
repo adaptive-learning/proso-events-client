@@ -142,5 +142,9 @@ class Pusher:
     def push_events(self, limit: int):
         for event_type in self.events:
             if len(self.events[event_type]) >= limit:
-                self.api_client.push_many_events(event_type, self.events[event_type])
-                self.events[event_type] = []
+                try:
+                    self.api_client.push_many_events(event_type, self.events[event_type])
+                    self.events[event_type] = []
+                except Exception as e:
+                    min_date = min([i['datetime'] for i in self.events[event_type]])
+                    raise Exception("API Exception: %s. Datetime of first uncommitted event is: %s" % (e, min_date))
