@@ -12,7 +12,7 @@ with open('LICENSE') as f:
 
 setup(
     name='proso-events-client',
-    version='0.0.4',
+    version='0.0.5',
     description='Client for "event storage"."',
     long_description=README,
     author='Jan Karásek',
