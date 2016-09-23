@@ -62,10 +62,16 @@ class EventsLogger:
         self.event_file = EventFile(log_path)
         self.source = source
 
-    def emit(self, event_type: str, data: dict, tags: list = [], time: datetime.datetime = datetime.datetime.now()):
+    def emit(self, event_type: str, data: dict, tags: list = None, time: datetime.datetime = None):
         """
         Add new event to datastore (file).
         """
+
+        if tags is None:
+            tags = []
+
+        if time is None:
+            time = datetime.datetime.now()
 
         data['_type'] = event_type
         data['tags'] = tags
