@@ -1,6 +1,8 @@
 from .context import event_client
 import pytest
 from .helpers import *
+import datetime
+import random
 
 
 def initialize(db_path):
@@ -23,7 +25,7 @@ def test_integration(tmpdir, delete_table: bool = True):
     # add events
     payload = get_payload(10)
     for i in payload:
-        event_logger.emit(type_name, i, ['test'])
+        event_logger.emit(type_name, i, ['test'], datetime.datetime.fromtimestamp(random.randint(1325376000, 1476298681)))
 
     # send to datastore via API
     pusher = event_client.Pusher(event_api, event_logger.event_file)

@@ -19,6 +19,16 @@ class EventClient:
             'x-api-token': self.token,
         }
 
+    def meta_set(self, event_type: str, value_type: str, key: str, value: str):
+        data = {
+            'source': self.source,
+            'value_type': value_type,
+            'key': key,
+            'value': value
+        }
+
+        self.api_post_req('/type/%s/meta' % event_type, data)
+
     def push_event(self, event_type: str, data: dict):
         return self.push_many_events(event_type, [data])
 

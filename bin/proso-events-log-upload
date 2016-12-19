@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+
+import click
+from proso.events.client import EventClient, Pusher, EventFile
+
+
+@click.command()
+@click.argument('token')
+@click.argument('source')
+@click.argument('log_file')
+@click.argument('endpoint', default='https://events.proso.hkar.eu')
+def handle(token: str, source: str, log_file: str, endpoint: str):
+    """Simple program that greets NAME for a total of COUNT times."""
+    event_client = EventClient(token, endpoint, source)
+    log_file = EventFile(log_file)
+    pusher = Pusher(event_client, log_file)
+    pusher.push_all()
+
+
+if __name__ == '__main__':
+    handle()

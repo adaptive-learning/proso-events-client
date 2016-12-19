@@ -19,11 +19,12 @@ setup(
     author_email='xkarase1@fi.muni.cz',
     url='',
     license=LICENSE,
-    include_package_data = True,
+    include_package_data=True,
     packages=find_packages(exclude=('tests', 'docs')),
+    scripts=['bin/proso-events-log-upload'],
     namespace_packages=['proso', 'proso.events'],
     install_requires=[
         str(r.req)
         for r in parse_requirements(DIR + '/requirements.txt', session=False)
-    ]
+        ]
 )
